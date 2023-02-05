@@ -1,46 +1,100 @@
+import React, { useState, useRef } from "react";
 import "./App.css";
 
 function App() {
+  const [logElem, setLogElem] = useState("");
+  // const videoElem = document.getElementById("video");
+  const videoElem = useRef(null);
+  // const logElem = document.getElementById("log");
+  // const startElem = document.getElementById("start");
+  // const stopElem = document.getElementById("stop");
+
+  const displayMediaOptions = {
+    video: {
+      displaySurface: "window",
+    },
+    audio: false,
+  };
+
+  console.log = (msg) =>
+    setLogElem(
+      <>
+        {logElem} + {msg}
+        <br />
+      </>
+    );
+  console.error = (msg) =>
+    setLogElem(
+      <>
+        {logElem} + <span class="error">{msg}</span>
+        <br />
+      </>
+    );
+  console.warn = (msg) =>
+    setLogElem(
+      <>
+        {logElem} + <span class="warn">{msg}</span>
+        <br />
+      </>
+    );
+  console.info = (msg) =>
+    setLogElem(
+      <>
+        {logElem} + <span class="info">{msg}</span>
+        <br />
+      </>
+    );
+
+  async function startCapture() {
+    setLogElem("");
+    try {
+      videoElem.current.srcObject =
+        await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+      dumpOptionsInfo();
+    } catch (err) {
+      console.error(`Error: ${err}`);
+    }
+  }
+
+  function stopCapture(evt) {
+    let tracks = videoElem.current.srcObject.getTracks();
+
+    tracks.forEach((track) => track.stop());
+    videoElem.current.srcObject = null;
+  }
+
+  function dumpOptionsInfo() {
+    const videoTrack = videoElem.current.srcObject.getVideoTracks()[0];
+
+    console.info("Track settings:");
+    console.info(JSON.stringify(videoTrack.getSettings(), null, 2));
+    console.info("Track constraints:");
+    console.info(JSON.stringify(videoTrack.getConstraints(), null, 2));
+  }
+
   return (
     <div className="App">
-      <div class="container p-3 my-3">
-        <div class="row">
-          <h3>Capture Photo using JavaScript Web API</h3>
-          <button class="btn btn-primary" id="start-camera">
-            <i class="fas fa-camera"></i>
-            Start Camera
-          </button>
-        </div>
-        <div class="row align-items-center">
-          <div class="col-lg-5">
-            <video id="video" autoplay></video>
-          </div>
-          <div class="col-lg-2 justify-content-center">
-            <button class="btn btn-primary" id="click-photo">
-              <i class="fas fa-camera-retro"></i>
-              Click Photo
-            </button>
-            <button class="btn btn-secondary" id="resetBtn">
-              <i class="fas fa-sync-alt"></i>
-              Reset
-            </button>
-          </div>
-          <div class="col-lg-5" id="dataurl-container">
-            <canvas id="canvas" width="420" height="240"></canvas>
-          </div>
-        </div>
-        <div class="row justify-content-end p-3" id="downloadDIV">
-          <input
-            class="form-control"
-            type="text"
-            id="fileName"
-            placeholder="Enter File Name"
-          />
-          <a class="btn btn-link" id="downloadID">
-            Download
-          </a>
-        </div>
-      </div>
+      <p>
+        This example shows you the contents of the selected part of your
+        display. Click the Start Capture button to begin.
+      </p>
+
+      <p>
+        <button id="start" onClick={() => startCapture()}>
+          Start Capture
+        </button>
+        &nbsp;
+        <button id="stop" onClick={() => stopCapture()}>
+          Stop Capture
+        </button>
+      </p>
+
+      <video ref={videoElem} id="video" autoPlay></video>
+      <br />
+
+      <strong>Log:</strong>
+      <br />
+      <pre id="log">{logElem}</pre>
     </div>
   );
 }
