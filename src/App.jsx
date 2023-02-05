@@ -74,10 +74,7 @@ function App() {
 
   return (
     <div className="App">
-      <p>
-        This example shows you the contents of the selected part of your
-        display. Click the Start Capture button to begin.
-      </p>
+      <h2>POC of screen capture web api</h2>
 
       <p>
         <button id="start" onClick={() => startCapture()}>
