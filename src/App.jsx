@@ -91,7 +91,7 @@ function App() {
 
       <strong>Log:</strong>
       <br />
-      <pre id="log">{logElem}</pre>
+      {/* <pre id="log">{logElem}</pre> */}
     </div>
   );
 }
